@@ -505,7 +505,7 @@ jobs:
           do
             echo ">>$line<<"
             oras push \
-                --manifest-config /dev/null:application/vnd.splunk.ent.package.v1.tar+gzip \
+                --config /dev/null:application/vnd.splunk.ent.package.v1.tar+gzip \
                 "$line" \
                 "${{ steps.getappid.outputs.result }}".spl
             echo "  complete"
