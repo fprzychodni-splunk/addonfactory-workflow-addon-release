@@ -462,7 +462,11 @@ jobs:
           echo appid="$appid"
           echo "::set-output name=result::$appid"
       - run: |
-          brew install oras
+          curl -LO https://github.com/oras-project/oras/releases/download/v0.15.1/oras_0.15.1_linux_amd64.tar.gz
+          mkdir -p oras-install/
+          tar -zxf oras_0.15.1_*.tar.gz -C oras-install/
+          mv oras-install/oras /usr/local/bin/
+          rm -rf oras_0.15.1_*.tar.gz oras-install/
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
       - name: Login to GitHub Packages Docker Registry
