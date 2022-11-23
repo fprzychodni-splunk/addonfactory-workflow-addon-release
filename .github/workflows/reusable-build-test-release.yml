@@ -294,7 +294,7 @@ jobs:
         run: |
           echo "::set-output name=name::$(basename "${{ steps.slim.outputs.OUTPUT }}")"
           basename "${{ steps.slim.outputs.OUTPUT }}"
-          aws s3 cp "${{ steps.slim.outputs.OUTPUT }}" s3://ta-staging-artifacts/ta-apps/
+          aws s3 cp "${{ steps.slim.outputs.OUTPUT }}" s3://ta-production-artifacts/ta-apps/
       - name: artifact-splunk-parts
         uses: actions/upload-artifact@v3
         with:
@@ -540,8 +540,8 @@ jobs:
       delay-destroy-ko: ${{ steps.delay-destroy-setup.outputs.delay-destroy-ko }}
       delay-destroy-ui: ${{ steps.delay-destroy-setup.outputs.delay-destroy-ui }}
       delay-destroy-modinput: ${{ steps.delay-destroy-setup.outputs.delay-destroy-modinput }}
-      delay-destroy-escu: ${{ steps.delay-destroy-setup.outputs.delay-destroy-escu }}
       delay-destroy-scripted-inputs: ${{ steps.delay-destroy-setup.outputs.delay-destroy-scripted-inputs }}
+      delay-destroy-escu: ${{ steps.delay-destroy-setup.outputs.delay-destroy-escu }}
       preserve-infra: ${{ steps.delay-destroy-setup.outputs.preserve-infra }}
     steps:
       - uses: actions/checkout@v3
@@ -551,12 +551,12 @@ jobs:
         id: test-setup
         shell: bash
         run: |
-          echo "::set-output name=argo-server::argo.staging.wfe.splgdi.com:443"
+          echo "::set-output name=argo-server::argo.wfe.splgdi.com:443"
           echo "::set-output name=argo-http1::true"
           echo "::set-output name=argo-secure::true"
           echo "::set-output name=argo-base-href::\'\'"
           echo "::set-output name=argo-namespace::workflows"
-          echo "::set-output name=argo-workflow-tmpl-name::ta-workflow-delay-destroy"
+          echo "::set-output name=argo-workflow-tmpl-name::ta-workflow"
 
           ADDON_NAME=$(crudini --get package/default/app.conf id name | tr '[:lower:]' '[:upper:]')
           if [[ -n $(echo "${ADDON_NAME}" | awk -F 'SPLUNK_TA_' '{print $2}') ]];
@@ -575,10 +575,10 @@ jobs:
           LABELS="addon-name=${ADDON_NAME}"
           echo "::set-output name=labels::$LABELS"
 
-          ADDON_UPLOAD_PATH="s3://ta-staging-artifacts/ta-apps/${{ needs.build.outputs.buildname }}"
+          ADDON_UPLOAD_PATH="s3://ta-production-artifacts/ta-apps/${{ needs.build.outputs.buildname }}"
           echo "::set-output name=addon-upload-path::$ADDON_UPLOAD_PATH"
           echo "::set-output name=directory-path::/tmp"
-          echo "::set-output name=s3-bucket::ta-staging-artifacts"
+          echo "::set-output name=s3-bucket::ta-production-artifacts"
 
       - name: set delay destroy
         id: delay-destroy-setup
@@ -597,8 +597,6 @@ jobs:
             for i in $TESTSET; do
                 echo "$i"
                 if [[ $tests =~ "$i" ]]; then
-                    echo "Inside changing if condition"
-                    echo "$i"
                     eval DELAY_DESTROY_$i="Yes"
                 fi
             done
@@ -607,8 +605,6 @@ jobs:
           echo "$DELAY_DESTROY_knowledge"
           echo "$DELAY_DESTROY_ui"
           echo "$DELAY_DESTROY_modinput_functional"
-          echo "$DELAY_DESTROY_escu"
-          echo "$DELAY_DESTROY_scripted_inputs"
           echo "::set-output name=delay-destroy-ko::$DELAY_DESTROY_knowledge"
           echo "::set-output name=delay-destroy-ui::$DELAY_DESTROY_ui"
           echo "::set-output name=delay-destroy-modinput::$DELAY_DESTROY_modinput_functional"
@@ -653,7 +649,7 @@ jobs:
       - name: Read secrets from AWS Secrets Manager into environment variables
         id: get-argo-token
         run: |
-          ARGO_TOKEN=$(aws secretsmanager get-secret-value --secret-id ta-staging-github-workflow-automation-token | jq -r '.SecretString')
+          ARGO_TOKEN=$(aws secretsmanager get-secret-value --secret-id ta-github-workflow-automation-token | jq -r '.SecretString')
           echo "::set-output name=argo-token::$ARGO_TOKEN"
       - name: create job name
         id: create-job-name
@@ -665,6 +661,7 @@ jobs:
           JOB_NAME=${JOB_NAME//[_.]/-}
           JOB_NAME=$(echo "$JOB_NAME" | tr '[:upper:]' '[:lower:]')
           echo "JOB_NAME: $JOB_NAME"
+          echo "${{ needs.setup.outputs.delay-destroy-ko }}"
           echo "::set-output name=job-name::$JOB_NAME"
 
       - name: run-tests
@@ -688,7 +685,7 @@ jobs:
       - name: Read secrets from AWS Secrets Manager again into environment variables in case credential rotation
         id: update-argo-token
         run: |
-          ARGO_TOKEN=$(aws secretsmanager get-secret-value --secret-id ta-staging-github-workflow-automation-token | jq -r '.SecretString')
+          ARGO_TOKEN=$(aws secretsmanager get-secret-value --secret-id ta-github-workflow-automation-token | jq -r '.SecretString')
           echo "::set-output name=argo-token::$ARGO_TOKEN"
       - name: Check if pod was deleted
         id: is-pod-deleted
@@ -831,7 +828,7 @@ jobs:
       - name: Read secrets from AWS Secrets Manager into environment variables
         id: get-argo-token
         run: |
-          ARGO_TOKEN=$(aws secretsmanager get-secret-value --secret-id ta-staging-github-workflow-automation-token | jq -r '.SecretString')
+          ARGO_TOKEN=$(aws secretsmanager get-secret-value --secret-id ta-github-workflow-automation-token | jq -r '.SecretString')
           echo "::set-output name=argo-token::$ARGO_TOKEN"
       - name: create job name
         id: create-job-name
@@ -843,13 +840,6 @@ jobs:
           JOB_NAME=${JOB_NAME//[_.:]/-}
           JOB_NAME=$(echo "$JOB_NAME" | tr '[:upper:]' '[:lower:]')
           echo "::set-output name=job-name::$JOB_NAME"
-          echo "JOB_NAME: $JOB_NAME"
-          echo "${{ needs.setup.outputs.run_knowledge }}"
-          echo "${{ needs.setup.outputs.run_ui }}" 
-          echo "${{ needs.setup.outputs.run_modinput }}"
-          echo "${{ needs.setup.outputs.run_scripted_inputs }}"
-          echo "${{ needs.setup.outputs.run_escu }}"
-          echo "Finally print true"
       - name: run-tests
         id: run-tests
         env:
@@ -871,7 +861,7 @@ jobs:
       - name: Read secrets from AWS Secrets Manager again into environment variables in case credential rotation
         id: update-argo-token
         run: |
-          ARGO_TOKEN=$(aws secretsmanager get-secret-value --secret-id ta-staging-github-workflow-automation-token | jq -r '.SecretString')
+          ARGO_TOKEN=$(aws secretsmanager get-secret-value --secret-id ta-github-workflow-automation-token | jq -r '.SecretString')
           echo "::set-output name=argo-token::$ARGO_TOKEN"
       - name: Check if pod was deleted
         id: is-pod-deleted
@@ -1001,7 +991,7 @@ jobs:
       - name: Read secrets from AWS Secrets Manager into environment variables
         id: get-argo-token
         run: |
-          ARGO_TOKEN=$(aws secretsmanager get-secret-value --secret-id ta-staging-github-workflow-automation-token | jq -r '.SecretString')
+          ARGO_TOKEN=$(aws secretsmanager get-secret-value --secret-id ta-github-workflow-automation-token | jq -r '.SecretString')
           echo "::set-output name=argo-token::$ARGO_TOKEN"
       - name: create job name
         id: create-job-name
@@ -1046,7 +1036,7 @@ jobs:
       - name: Read secrets from AWS Secrets Manager again into environment variables in case credential rotation
         id: update-argo-token
         run: |
-          ARGO_TOKEN=$(aws secretsmanager get-secret-value --secret-id ta-staging-github-workflow-automation-token | jq -r '.SecretString')
+          ARGO_TOKEN=$(aws secretsmanager get-secret-value --secret-id ta-github-workflow-automation-token | jq -r '.SecretString')
           echo "::set-output name=argo-token::$ARGO_TOKEN"
       - name: Check if pod was deleted
         id: is-pod-deleted
@@ -1138,7 +1128,7 @@ jobs:
           reporter: java-junit
 
   run-scripted-input-tests-full-matrix:
-    if: ${{ needs.test-inventory.outputs.scripted_inputs == 'true' && ( github.base_ref == 'main' || github.ref_name == 'main' ) && needs.setup.outputs.delay-destroy-scripted_inputs == 'Yes' }}
+    if: ${{ needs.test-inventory.outputs.scripted_inputs == 'true' && ( github.base_ref == 'main' || github.ref_name == 'main' ) && needs.setup.outputs.delay-destroy-scripted-inputs == 'Yes' }}
     needs:
       - build
       - test-inventory
@@ -1173,7 +1163,7 @@ jobs:
       - name: Read secrets from AWS Secrets Manager into environment variables
         id: get-argo-token
         run: |
-          ARGO_TOKEN=$(aws secretsmanager get-secret-value --secret-id ta-staging-github-workflow-automation-token | jq -r '.SecretString')
+          ARGO_TOKEN=$(aws secretsmanager get-secret-value --secret-id ta-github-workflow-automation-token | jq -r '.SecretString')
           echo "::set-output name=argo-token::$ARGO_TOKEN"
       - name: create job name
         id: create-job-name
@@ -1209,7 +1199,7 @@ jobs:
           labels: ${{ needs.setup.outputs.labels }}
           workflow-tmpl-name: ${{ needs.setup.outputs.argo-workflow-tmpl-name }}
           workflow-template-ns: ${{ needs.setup.outputs.argo-namespace }}
-          delay-destroy: ${{ needs.setup.outputs.delay-destroy-scripted_inputs }}
+          delay-destroy: ${{ needs.setup.outputs.delay-destroy }}
           addon-url: ${{ needs.setup.outputs.addon-upload-path }}
           addon-name: ${{ needs.setup.outputs.addon-name }}
           vendor-version: ${{ matrix.vendor-version.image }}
@@ -1306,7 +1296,7 @@ jobs:
           reporter: java-junit
 
   run-scripted-input-tests-canary:
-    if: ${{ needs.test-inventory.outputs.scripted_inputs == 'true' && ( github.base_ref == 'develop' || github.ref_name == 'develop' ) && needs.setup.outputs.delay-destroy-scripted_inputs == 'Yes' }}
+    if: ${{ needs.test-inventory.outputs.scripted_inputs == 'true' && ( github.base_ref == 'develop' || github.ref_name == 'develop' ) && needs.setup.outputs.delay-destroy-scripted-inputs == 'Yes' }}
     needs:
       - build
       - test-inventory
@@ -1341,7 +1331,7 @@ jobs:
       - name: Read secrets from AWS Secrets Manager into environment variables
         id: get-argo-token
         run: |
-          ARGO_TOKEN=$(aws secretsmanager get-secret-value --secret-id ta-staging-github-workflow-automation-token | jq -r '.SecretString')
+          ARGO_TOKEN=$(aws secretsmanager get-secret-value --secret-id ta-github-workflow-automation-token | jq -r '.SecretString')
           echo "::set-output name=argo-token::$ARGO_TOKEN"
       - name: create job name
         id: create-job-name
@@ -1376,7 +1366,7 @@ jobs:
           labels: ${{ needs.setup.outputs.labels }}
           workflow-tmpl-name: ${{ needs.setup.outputs.argo-workflow-tmpl-name }}
           workflow-template-ns: ${{ needs.setup.outputs.argo-namespace }}
-          delay-destroy: ${{ needs.setup.outputs.delay-destroy-scripted_inputs }}
+          delay-destroy: ${{ needs.setup.outputs.delay-destroy }}
           addon-url: ${{ needs.setup.outputs.addon-upload-path }}
           addon-name: ${{ needs.setup.outputs.addon-name }}
           vendor-version: ${{ matrix.vendor-version.image }}
@@ -1507,7 +1497,7 @@ jobs:
       - name: Read secrets from AWS Secrets Manager into environment variables
         id: get-argo-token
         run: |
-          ARGO_TOKEN=$(aws secretsmanager get-secret-value --secret-id ta-staging-github-workflow-automation-token | jq -r '.SecretString')
+          ARGO_TOKEN=$(aws secretsmanager get-secret-value --secret-id ta-github-workflow-automation-token | jq -r '.SecretString')
           echo "::set-output name=argo-token::$ARGO_TOKEN"
       - name: create job name
         id: create-job-name
@@ -1548,7 +1538,7 @@ jobs:
           labels: ${{ needs.setup.outputs.labels }}
           workflow-tmpl-name: ${{ needs.setup.outputs.argo-workflow-tmpl-name }}
           workflow-template-ns: ${{ needs.setup.outputs.argo-namespace }}
-          delay-destroy: ${{ needs.setup.outputs.delay-destroy-escu }}
+          delay-destroy: ${{ needs.setup.outputs.delay-destroy }}
           addon-url: ${{ needs.setup.outputs.addon-upload-path }}
           addon-name: ${{ needs.setup.outputs.addon-name }}
           vendor-version: ${{ matrix.vendor-version.image }}
@@ -1791,5 +1781,4 @@ jobs:
           git_token: ${{secrets.GH_TOKEN}}
           skynet-token: ${{ secrets.SKYNET_TOKEN }}
           skynet-url: "https://http-inputs-services-ingest.splunkcloud.com/services/collector/event"        
-
     
