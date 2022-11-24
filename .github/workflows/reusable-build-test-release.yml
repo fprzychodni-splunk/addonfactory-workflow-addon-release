@@ -547,7 +547,6 @@ jobs:
       execute-escu: ${{ steps.delay-destroy-setup.outputs.execute-escu }}
       execute-modinput: ${{ steps.delay-destroy-setup.outputs.execute-modinput }}
       execute-scripted-inputs: ${{ steps.delay-destroy-setup.outputs.execute-scripted-inputs }}
-      preserve-infra: ${{ steps.delay-destroy-setup.outputs.preserve-infra }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -595,9 +594,7 @@ jobs:
               eval DELAY_DESTROY_$i="No"
               eval EXECUTE_$i="Yes"
           done
-          PRESERVE_INFRA="false"
           if [[ '${{ github.event.label.name }}' == 'preserve_infra' ]]; then
-            PRESERVE_INFRA="true"
             echo "${{ github.event.pull_request.body }}" >> body.txt
             tests=$(grep -i "^preserve:" body.txt | { grep -v grep || true; })
             for i in $TESTSET; do
@@ -618,7 +615,6 @@ jobs:
           echo "::set-output name=delay-destroy-modinput::$DELAY_DESTROY_modinput_functional"
           echo "::set-output name=delay-destroy-scripted-inputs::$DELAY_DESTROY_scripted_inputs"
           echo "::set-output name=delay-destroy-escu::$DELAY_DESTROY_escu"
-          echo "::set-output name=preserve-infra::$PRESERVE_INFRA"
           echo "::set-output name=execute-ko::$EXECUTE_knowledge"
           echo "::set-output name=execute-ui::$EXECUTE_ui"
           echo "::set-output name=execute-modinput::$EXECUTE_modinput_functional"
