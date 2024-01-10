@@ -570,7 +570,9 @@ jobs:
             ${{ runner.os }}-pip-
       - name: Install deps
         if: ${{ steps.checklibs.outputs.ENABLED == 'true' }}
-        run: pip install -r requirements_dev.txt
+        run: |
+          git config --global url."https://${{ secrets.GH_TOKEN_ADMIN }}@github.com".insteadOf https://github.com
+          pip install -r requirements_dev.txt
       - name: Semantic Release Get Next
         id: semantic
         if: github.event_name != 'pull_request'
