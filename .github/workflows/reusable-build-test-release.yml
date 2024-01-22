@@ -441,7 +441,7 @@ jobs:
            fi
           if [ ! -f requirements_dev.txt ]; then echo no requirements;exit 0 ;fi
           git config --global --add url."https://${{ secrets.GH_TOKEN_ADMIN }}@github.com".insteadOf https://github.com
-          git config --global --add url."https://${{ secrets.GH_TOKEN_ADMIN }}@github.com".insteadOf ssh://git@github.com
+          git config --global --add url."https://${{ secrets.GH_TOKEN_ADMIN }}@github.com".insteadOf git@github.com
           pip install -r requirements_dev.txt
       - name: Create directories
         run: |
@@ -491,7 +491,7 @@ jobs:
            fi
           if [ ! -f requirements_dev.txt ]; then echo no requirements;exit 0 ;fi
           git config --global --add url."https://${{ secrets.GH_TOKEN_ADMIN }}@github.com".insteadOf https://github.com
-          git config --global --add url."https://${{ secrets.GH_TOKEN_ADMIN }}@github.com".insteadOf ssh://git@github.com
+          git config --global --add url."https://${{ secrets.GH_TOKEN_ADMIN }}@github.com".insteadOf git@github.com
           pip install -r requirements_dev.txt
       - name: Create directories
         run: |
@@ -574,7 +574,7 @@ jobs:
         if: ${{ steps.checklibs.outputs.ENABLED == 'true' }}
         run: |
           git config --global --add url."https://${{ secrets.GH_TOKEN_ADMIN }}@github.com".insteadOf https://github.com
-          git config --global --add url."https://${{ secrets.GH_TOKEN_ADMIN }}@github.com".insteadOf ssh://git@github.com
+          git config --global --add url."https://${{ secrets.GH_TOKEN_ADMIN }}@github.com".insteadOf git@github.com
           pip install -r requirements_dev.txt
       - name: Semantic Release Get Next
         id: semantic
@@ -707,7 +707,7 @@ jobs:
             ${{ runner.os }}-pip-python3_9
       - run: |
           git config --global --add url."https://${{ secrets.GH_TOKEN_ADMIN }}@github.com".insteadOf https://github.com
-          git config --global --add url."https://${{ secrets.GH_TOKEN_ADMIN }}@github.com".insteadOf ssh://git@github.com
+          git config --global --add url."https://${{ secrets.GH_TOKEN_ADMIN }}@github.com".insteadOf git@github.com
           pip install -r requirements_dev.txt
       - id: semantic
         if: github.event_name != 'pull_request'
