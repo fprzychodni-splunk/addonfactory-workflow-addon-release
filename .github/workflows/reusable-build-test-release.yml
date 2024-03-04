@@ -289,6 +289,7 @@ jobs:
           gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /repos/fossas/fossa-cli/actions/artifacts/1287720641/zip >> fossa-1287720641-linux-binaries.zip
           unzip fossa-1287720641-linux-binaries.zip
           mv fossa /usr/local/bin/fossa
+          chmod 755 /usr/local/bin/fossa
           fossa --version
           fossa analyze --debug
           fossa report attribution --format text --timeout 600 > /tmp/THIRDPARTY
@@ -314,6 +315,7 @@ jobs:
           gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /repos/fossas/fossa-cli/actions/artifacts/1287720641/zip >> fossa-1287720641-linux-binaries.zip
           unzip fossa-1287720641-linux-binaries.zip
           mv fossa /usr/local/bin/fossa
+          chmod 755 /usr/local/bin/fossa
           fossa --version
           fossa test --debug
         env:
