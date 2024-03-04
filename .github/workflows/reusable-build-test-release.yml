@@ -317,7 +317,7 @@ jobs:
           mv fossa /usr/local/bin/fossa
           chmod 755 /usr/local/bin/fossa
           fossa --version
-          fossa test --debug -project poetrywithnewtool
+          fossa test --debug
         env:
           GH_TOKEN: ${{ github.token }}
           FOSSA_API_KEY: ${{ secrets.FOSSA_API_KEY }}
