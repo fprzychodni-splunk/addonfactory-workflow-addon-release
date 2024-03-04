@@ -301,7 +301,12 @@ jobs:
         with:
           name: THIRDPARTY
           path: /tmp/THIRDPARTY
-
+      - name: upload fossa debug file
+        uses: actions/upload-artifact@v3
+        with:
+          name: fossa_debug
+          path: fossa.debug.json.gz
+        
   fossa-test:
     continue-on-error: true
     runs-on: ubuntu-latest
