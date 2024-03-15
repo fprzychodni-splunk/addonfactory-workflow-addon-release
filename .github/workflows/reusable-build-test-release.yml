@@ -290,6 +290,13 @@ jobs:
           unzip fossa-1287720641-linux-binaries.zip
           mv fossa /usr/local/bin/fossa
           chmod 755 /usr/local/bin/fossa
+          echo "ls -la ."
+          ls -la
+          echo "cat pyproject.toml"
+          cat pyproject.toml
+          echo "cat poetry.lock"
+          cat poetry.lock
+          echo "fossa --version:"
           fossa --version
           fossa analyze --debug --project poetrywithnewtool
           fossa report attribution --format text --timeout 600 > /tmp/THIRDPARTY
