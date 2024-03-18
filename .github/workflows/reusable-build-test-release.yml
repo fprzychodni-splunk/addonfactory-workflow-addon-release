@@ -298,7 +298,7 @@ jobs:
           cat poetry.lock
           echo "fossa --version:"
           fossa --version
-          fossa analyze --debug --project poetrywithnewtool
+          fossa analyze --debug
           fossa report attribution --format text --timeout 600 > /tmp/THIRDPARTY
         env:
           GH_TOKEN: ${{ github.token }}
