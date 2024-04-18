@@ -1028,7 +1028,7 @@ jobs:
         sc4s: ${{ fromJson(needs.meta.outputs.matrix_supportedSC4S) }}
 
     container:
-      image: ghcr.io/splunk/workflow-engine-base:2.0.12
+      image: ghcr.io/splunk/workflow-engine-base:2.0.3
     env:
       ARGO_SERVER: ${{ needs.setup.outputs.argo-server }}
       ARGO_HTTP1: ${{ needs.setup.outputs.argo-http1 }}
@@ -1272,7 +1272,7 @@ jobs:
         sc4s: ${{ fromJson(needs.meta.outputs.matrix_supportedSC4S) }}
 
     container:
-      image: ghcr.io/splunk/workflow-engine-base:2.0.12
+      image: ghcr.io/splunk/workflow-engine-base:2.0.3
     env:
       ARGO_SERVER: ${{ needs.setup.outputs.argo-server }}
       ARGO_HTTP1: ${{ needs.setup.outputs.argo-http1 }}
@@ -1495,7 +1495,7 @@ jobs:
         vendor-version: ${{ fromJson(needs.meta.outputs.matrix_supportedUIVendors) }}
 
     container:
-      image: ghcr.io/splunk/workflow-engine-base:2.0.12
+      image: ghcr.io/splunk/workflow-engine-base:2.0.3
     env:
       ARGO_SERVER: ${{ needs.setup.outputs.argo-server }}
       ARGO_HTTP1: ${{ needs.setup.outputs.argo-http1 }}
@@ -1725,7 +1725,7 @@ jobs:
         vendor-version: ${{ fromJson(needs.meta.outputs.matrix_supportedModinputFunctionalVendors) }}
         marker: ${{ fromJson(inputs.marker) }}
     container:
-      image: ghcr.io/splunk/workflow-engine-base:2.0.12
+      image: ghcr.io/splunk/workflow-engine-base:2.0.3
     env:
       ARGO_SERVER: ${{ needs.setup.outputs.argo-server }}
       ARGO_HTTP1: ${{ needs.setup.outputs.argo-http1 }}
@@ -1965,7 +1965,7 @@ jobs:
         splunk: ${{ fromJson(needs.meta.outputs.matrix_combinedSplunkversion) }}
         os: [ "ubuntu:14.04", "ubuntu:16.04","ubuntu:18.04","ubuntu:22.04", "centos:7", "redhat:8.0", "redhat:8.2", "redhat:8.3", "redhat:8.4", "redhat:8.5" ]
     container:
-      image: ghcr.io/splunk/workflow-engine-base:2.0.12
+      image: ghcr.io/splunk/workflow-engine-base:2.0.3
     env:
       ARGO_SERVER: ${{ needs.setup.outputs.argo-server }}
       ARGO_HTTP1: ${{ needs.setup.outputs.argo-http1 }}
@@ -2201,7 +2201,7 @@ jobs:
         splunk: ${{ fromJson(needs.meta.outputs.matrix_combinedSplunkversion) }}
         os: [ "ubuntu:22.04", "centos:7","redhat:8.5" ]
     container:
-      image: ghcr.io/splunk/workflow-engine-base:2.0.12
+      image: ghcr.io/splunk/workflow-engine-base:2.0.3
     env:
       ARGO_SERVER: ${{ needs.setup.outputs.argo-server }}
       ARGO_HTTP1: ${{ needs.setup.outputs.argo-http1 }}
