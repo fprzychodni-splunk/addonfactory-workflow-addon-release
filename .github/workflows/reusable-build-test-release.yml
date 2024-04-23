@@ -229,7 +229,7 @@ jobs:
       pull-requests: read
       statuses: write
     steps:
-      - uses: amannn/action-semantic-pull-request@v5.4.0
+      - uses: amannn/action-semantic-pull-request@v5.5.0
         with:
           wip: true
           validateSingleCommit: true
@@ -259,7 +259,7 @@ jobs:
       packages: read
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: false
           persist-credentials: false
@@ -304,7 +304,7 @@ jobs:
       - setup-workflow
     if: ${{ needs.setup-workflow.outputs.skip-workflow != 'Yes' }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: run fossa analyze and create report
         run: |
           curl -H 'Cache-Control: no-cache' https://raw.githubusercontent.com/fossas/fossa-cli/master/install-latest.sh | bash
@@ -313,7 +313,7 @@ jobs:
         env:
           FOSSA_API_KEY: ${{ secrets.FOSSA_API_KEY }}
       - name: upload THIRDPARTY file
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: THIRDPARTY
           path: /tmp/THIRDPARTY
@@ -325,7 +325,7 @@ jobs:
       - fossa-scan
     if: ${{ needs.setup-workflow.outputs.skip-workflow != 'Yes' }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: run fossa test
         run: |
           curl -H 'Cache-Control: no-cache' https://raw.githubusercontent.com/fossas/fossa-cli/master/install-latest.sh | bash
@@ -341,7 +341,7 @@ jobs:
     if: ${{ needs.setup-workflow.outputs.skip-workflow != 'Yes' }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: REUSE Compliance Check
         uses: fsfe/reuse-action@v1.1
 
@@ -351,7 +351,7 @@ jobs:
       - setup-workflow
     if: ${{ needs.setup-workflow.outputs.skip-workflow != 'Yes' }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.7"
@@ -366,13 +366,13 @@ jobs:
     steps:
       - name: Checkout
         if: github.event_name != 'pull_request'
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: false
           fetch-depth: "0"
       - name: Checkout for PR
         if: github.event_name == 'pull_request'
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: false
           fetch-depth: "0"
@@ -391,7 +391,7 @@ jobs:
       image: returntocorp/semgrep
     if: ${{ needs.setup-workflow.outputs.skip-workflow != 'Yes' }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Semgrep
         id: semgrep
         run: semgrep ci
@@ -412,7 +412,7 @@ jobs:
       scripted_inputs: ${{ steps.testset.outputs.scripted_inputs }}
       ucc_modinput_functional: ${{ steps.modinput-version.outputs.ucc_modinput_tests }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - id: testset
         name: Check available test types
         run: |
@@ -446,7 +446,7 @@ jobs:
       statuses: read
       checks: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
@@ -472,7 +472,7 @@ jobs:
         run: cp tests/unit/pytest-ci.ini pytest.ini
       - name: Run Pytest with coverage
         run: poetry run pytest --cov=./ --cov-report=xml --junitxml=test-results/junit.xml tests/unit
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: success() || failure()
         with:
           name: test-results-unit-python_${{ matrix.python-version }}
@@ -497,7 +497,7 @@ jobs:
       statuses: read
       checks: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
@@ -523,7 +523,7 @@ jobs:
         run: cp tests/unit/pytest-ci.ini pytest.ini
       - name: Run Pytest with coverage
         run: poetry run pytest --cov=./ --cov-report=xml --junitxml=test-results/junit.xml tests/unit
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: success() || failure()
         with:
           name: test-results-unit-python_${{ matrix.python-version }}
@@ -548,7 +548,7 @@ jobs:
       contents: write
       packages: read
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           # Very Important semantic-release won't trigger a tagged
           # build if this is not set false
@@ -585,7 +585,7 @@ jobs:
         run: if [ -f requirements_dev.txt ]; then echo "ENABLED=true" >> "$GITHUB_OUTPUT"; fi
       - name: pip cache
         if: ${{ steps.checklibs.outputs.ENABLED == 'true' }}
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ steps.pip-cache.outputs.dir }}
           key: ${{ runner.os }}-pip-${{ hashFiles('requirements_dev.txt') }}
@@ -640,13 +640,13 @@ jobs:
           echo "VERSION=${FINALVERSION}" >> "$GITHUB_OUTPUT"
       - name: Download THIRDPARTY
         if: github.event_name != 'pull_request' && github.event_name != 'schedule'
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: THIRDPARTY
       - name: Download THIRDPARTY (Optional for PR and schedule)
         if: github.event_name == 'pull_request' || github.event_name == 'schedule'
         continue-on-error: true
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: THIRDPARTY
       - name: Update Notices
@@ -679,13 +679,13 @@ jobs:
           echo "OUTPUT=$PACKAGE" >> "$GITHUB_OUTPUT"
         if: always()
       - name: artifact-openapi
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: artifact-openapi
           path: ${{ github.workspace }}/${{ steps.uccgen.outputs.OUTPUT }}/appserver/static/openapi.json
         if: ${{ !cancelled() && needs.test-inventory.outputs.ucc_modinput_functional == 'true' && needs.test-inventory.outputs.modinput_functional == 'true' }}
       - name: artifact-splunk-base
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: package-splunkbase
           path: ${{ steps.slim.outputs.OUTPUT }}
@@ -720,7 +720,7 @@ jobs:
       contents: write
       packages: read
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           # Very Important semantic-release won't trigger a tagged
           # build if this is not set false
@@ -752,7 +752,7 @@ jobs:
         run: |
           echo "dir=$(pip cache dir)" >> "$GITHUB_OUTPUT"
       - name: pip cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ steps.pip-cache.outputs.dir }}
           key: ${{ runner.os }}-pip-python3_9-${{ hashFiles('requirements_dev.txt') }}
@@ -821,7 +821,7 @@ jobs:
       statuses: read
       checks: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install Python 3
         uses: actions/setup-python@v5
         with:
@@ -832,7 +832,7 @@ jobs:
           input-files: tests/requirement_test/logs
       - name: Archive production artifacts
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: test-results
           path: |
@@ -856,8 +856,8 @@ jobs:
           - "splunk_appinspect"
           - "manual"
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
         with:
           name: package-splunkbase
           path: build/package/
@@ -869,13 +869,13 @@ jobs:
           result_file: appinspect_result_${{ matrix.tags }}.json
       - name: upload-appinspect-report
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: appinspect_${{ matrix.tags }}_checks.json
           path: appinspect_result_${{ matrix.tags }}.json
       - name: upload-markdown
         if: matrix.tags == 'manual'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: check_markdown
           path: |
@@ -895,8 +895,8 @@ jobs:
         tags:
           - "cloud"
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
         with:
           name: package-splunkbase
           path: build/package
@@ -907,7 +907,7 @@ jobs:
           password: ${{ secrets.SPL_COM_PASSWORD }}
           app_path: build/package/
           included_tags: ${{ matrix.tags }}
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: appinspect-api-html-report-${{ matrix.tags }}
@@ -940,7 +940,7 @@ jobs:
     env:
       BUILD_NAME: ${{ needs.build.outputs.buildname }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
           token: ${{ secrets.GH_TOKEN_ADMIN }}
@@ -978,7 +978,7 @@ jobs:
           echo "spl-host-suffix=wfe.splgdi.com"
           echo "k8s-manifests-branch=${{ inputs.k8s-manifests-branch }}"
           } >> "$GITHUB_OUTPUT"
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         if: ${{ needs.test-inventory.outputs.ucc_modinput_functional == 'true' && needs.test-inventory.outputs.modinput_functional == 'true'}}
         id: download-openapi
         with:
@@ -1046,7 +1046,7 @@ jobs:
       statuses: read
       checks: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: configure git  # This step configures git to omit "dubious git ownership error" in later test-reporter stage
@@ -1061,7 +1061,7 @@ jobs:
         run: |
           echo "start_time=$(date +%s)" >> "$GITHUB_OUTPUT"
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v3
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -1209,27 +1209,27 @@ jobs:
           echo "pulling logs"
           mkdir -p ${{ needs.setup.outputs.directory-path }}/argo-logs
           aws s3 cp s3://${{ needs.setup.outputs.s3-bucket }}/${WORKFLOW_NAME}/ ${{ needs.setup.outputs.directory-path }}/argo-logs/ --recursive
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
           name: archive splunk ${{ matrix.splunk.version }}${{ secrets.OTHER_TA_REQUIRED_CONFIGS }} ${{ env.TEST_TYPE }} tests artifacts
           path: |
             ${{ needs.setup.outputs.directory-path }}/test-results
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
           name: archive splunk ${{ matrix.splunk.version }}${{ secrets.OTHER_TA_REQUIRED_CONFIGS }} ${{ env.TEST_TYPE }} tests logs
           path: |
             ${{ needs.setup.outputs.directory-path }}/argo-logs
       - name: Upload cim-compliance-report for ${{ matrix.splunk.version }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: ${{ matrix.splunk.islatest == true }}
         with:
           name: cim-compliance-report
           path: |
             ${{ needs.setup.outputs.directory-path }}/test-results/cim-compliance-report.md
       - name: Upload cim-field-report for ${{ matrix.splunk.version }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: ${{ matrix.splunk.islatest == true }}
         with:
           name: cim-field-report
@@ -1237,7 +1237,7 @@ jobs:
             ${{ needs.setup.outputs.directory-path }}/test-results/cim_field_report.json
       - name: Test Report
         id: test_report
-        uses: dorny/test-reporter@v1.7.0
+        uses: dorny/test-reporter@v1.9.0
         if: ${{ !cancelled() }}
         with:
           name: splunk ${{ matrix.splunk.version }}${{ secrets.OTHER_TA_REQUIRED_CONFIGS }} ${{ env.TEST_TYPE }} test report
@@ -1248,7 +1248,7 @@ jobs:
         run: |
           echo "pulling diag"
           aws s3 cp s3://${{ needs.setup.outputs.s3-bucket }}/diag-${{ steps.create-job-name.outputs.job-name }}/diag-${{ steps.create-job-name.outputs.job-name }}.tgz ${{ needs.setup.outputs.directory-path }}/
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: ${{ failure() && steps.test_report.outputs.conclusion == 'failure' }}
         with:
           name: archive splunk ${{ matrix.splunk.version }}${{ secrets.OTHER_TA_REQUIRED_CONFIGS }} ${{ env.TEST_TYPE }} tests diag
@@ -1289,7 +1289,7 @@ jobs:
       statuses: read
       checks: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: configure git  # This step configures git to omit "dubious git ownership error" in later test-reporter stage
@@ -1304,7 +1304,7 @@ jobs:
         run: |
           echo "start_time=$(date +%s)" >> "$GITHUB_OUTPUT"  
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v3
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -1446,13 +1446,13 @@ jobs:
           echo "pulling logs"
           mkdir -p ${{ needs.setup.outputs.directory-path }}/argo-logs
           aws s3 cp s3://${{ needs.setup.outputs.s3-bucket }}/${WORKFLOW_NAME}/ ${{ needs.setup.outputs.directory-path }}/argo-logs/ --recursive
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
           name: archive splunk ${{ matrix.splunk.version }} ${{ env.TEST_TYPE }} tests artifacts
           path: |
             ${{ needs.setup.outputs.directory-path }}/test-results
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
           name: archive splunk ${{ matrix.splunk.version }} ${{ env.TEST_TYPE }} tests logs
@@ -1460,7 +1460,7 @@ jobs:
             ${{ needs.setup.outputs.directory-path }}/argo-logs
       - name: Test Report
         id: test_report
-        uses: dorny/test-reporter@v1.7.0
+        uses: dorny/test-reporter@v1.9.0
         if: ${{ !cancelled() }}
         with:
           name: splunk ${{ matrix.splunk.version }} ${{ env.TEST_TYPE }} test report
@@ -1471,7 +1471,7 @@ jobs:
         run: |
           echo "pulling diag"
           aws s3 cp s3://${{ needs.setup.outputs.s3-bucket }}/diag-${{ steps.create-job-name.outputs.job-name }}/diag-${{ steps.create-job-name.outputs.job-name }}.tgz ${{ needs.setup.outputs.directory-path }}/
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: ${{ failure() && steps.test_report.outputs.conclusion == 'failure' }}
         with:
           name: archive splunk ${{ matrix.splunk.version }} ${{ env.TEST_TYPE }} tests diag
@@ -1513,7 +1513,7 @@ jobs:
       statuses: read
       checks: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: configure git  # This step configures git to omit "dubious git ownership error" in later test-reporter stage
@@ -1528,7 +1528,7 @@ jobs:
         run: |
           echo "start_time=$(date +%s)" >> "$GITHUB_OUTPUT"
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v3
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -1676,13 +1676,13 @@ jobs:
           echo "pulling logs"
           mkdir -p ${{ needs.setup.outputs.directory-path }}/argo-logs
           aws s3 cp s3://${{ needs.setup.outputs.s3-bucket }}/${WORKFLOW_NAME}/ ${{ needs.setup.outputs.directory-path }}/argo-logs/ --recursive
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
           name: archive splunk ${{ matrix.splunk.version }}${{ secrets.OTHER_TA_REQUIRED_CONFIGS }} ${{ env.TEST_TYPE }} ${{ matrix.browser }} ${{ matrix.vendor-version.image }} tests artifacts
           path: |
             ${{ needs.setup.outputs.directory-path }}/test-results
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
           name: archive splunk ${{ matrix.splunk.version }}${{ secrets.OTHER_TA_REQUIRED_CONFIGS }} ${{ env.TEST_TYPE }} ${{ matrix.browser }} ${{ matrix.vendor-version.image }} tests logs
@@ -1690,7 +1690,7 @@ jobs:
             ${{ needs.setup.outputs.directory-path }}/argo-logs
       - name: Test Report
         id: test_report
-        uses: dorny/test-reporter@v1.7.0
+        uses: dorny/test-reporter@v1.9.0
         if: ${{ !cancelled() }}
         with:
           name: splunk ${{ matrix.splunk.version }}${{ secrets.OTHER_TA_REQUIRED_CONFIGS }} ${{ env.TEST_TYPE }} ${{ matrix.browser }} ${{ matrix.vendor-version.image }} test report
@@ -1701,7 +1701,7 @@ jobs:
         run: |
           echo "pulling diag"
           aws s3 cp s3://${{ needs.setup.outputs.s3-bucket }}/diag-${{ steps.create-job-name.outputs.job-name }}/diag-${{ steps.create-job-name.outputs.job-name }}.tgz ${{ needs.setup.outputs.directory-path }}/
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: ${{ failure() && steps.test_report.outputs.conclusion == 'failure' }}
         with:
           name: archive splunk ${{ matrix.splunk.version }}${{ secrets.OTHER_TA_REQUIRED_CONFIGS }} ${{ env.TEST_TYPE }} ${{ matrix.browser }} ${{ matrix.vendor-version.image }} tests diag
@@ -1743,7 +1743,7 @@ jobs:
       statuses: read
       checks: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: configure git  # This step configures git to omit "dubious git ownership error" in later test-reporter stage
@@ -1758,7 +1758,7 @@ jobs:
         run: |
           echo "start_time=$(date +%s)" >> "$GITHUB_OUTPUT"
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v3
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -1918,13 +1918,13 @@ jobs:
           echo "pulling logs"
           mkdir -p ${{ needs.setup.outputs.directory-path }}/argo-logs
           aws s3 cp s3://${{ needs.setup.outputs.s3-bucket }}/${WORKFLOW_NAME}/ ${{ needs.setup.outputs.directory-path }}/argo-logs/ --recursive
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
           name: archive splunk ${{ matrix.splunk.version }}${{ secrets.OTHER_TA_REQUIRED_CONFIGS }} ${{ env.TEST_TYPE }} ${{ matrix.vendor-version.image }} tests artifacts
           path: |
             ${{ needs.setup.outputs.directory-path }}/test-results
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
           name: archive splunk ${{ matrix.splunk.version }}${{ secrets.OTHER_TA_REQUIRED_CONFIGS }} ${{ env.TEST_TYPE }} ${{ matrix.vendor-version.image }} tests logs
@@ -1932,7 +1932,7 @@ jobs:
             ${{ needs.setup.outputs.directory-path }}/argo-logs
       - name: Test Report
         id: test_report
-        uses: dorny/test-reporter@v1.7.0
+        uses: dorny/test-reporter@v1.9.0
         if: ${{ !cancelled() }}
         with:
           name: splunk ${{ matrix.splunk.version }}${{ secrets.OTHER_TA_REQUIRED_CONFIGS }} ${{ env.TEST_TYPE }} ${{ matrix.vendor-version.image }} test report
@@ -1943,7 +1943,7 @@ jobs:
         run: |
           echo "pulling diag"
           aws s3 cp s3://${{ needs.setup.outputs.s3-bucket }}/diag-${{ steps.create-job-name.outputs.job-name }}/diag-${{ steps.create-job-name.outputs.job-name }}.tgz ${{ needs.setup.outputs.directory-path }}/
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: ${{ failure() && steps.test_report.outputs.conclusion == 'failure' }}
         with:
           name: archive splunk ${{ matrix.splunk.version }}${{ secrets.OTHER_TA_REQUIRED_CONFIGS }} ${{ env.TEST_TYPE }} ${{ matrix.vendor-version.image }} tests diag
@@ -1982,7 +1982,7 @@ jobs:
       statuses: read
       checks: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: configure git  # This step configures git to omit "dubious git ownership error" in later test-reporter stage
@@ -1997,7 +1997,7 @@ jobs:
         run: |
           echo "start_time=$(date +%s)" >> "$GITHUB_OUTPUT"
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v3
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -2154,13 +2154,13 @@ jobs:
           echo "pulling logs"
           mkdir -p ${{ needs.setup.outputs.directory-path }}/argo-logs
           aws s3 cp s3://${{ needs.setup.outputs.s3-bucket }}/${WORKFLOW_NAME}/ ${{ needs.setup.outputs.directory-path }}/argo-logs/ --recursive
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
           name: archive splunk ${{ matrix.splunk.version }}${{ secrets.OTHER_TA_REQUIRED_CONFIGS }} ${{ env.TEST_TYPE }} ${{ matrix.vendor-version.image }} ${{ steps.os-name-version.outputs.os-name }} ${{ steps.os-name-version.outputs.os-version }} tests artifacts
           path: |
             ${{ needs.setup.outputs.directory-path }}/test-results
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
           name: archive splunk ${{ matrix.splunk.version }}${{ secrets.OTHER_TA_REQUIRED_CONFIGS }} ${{ env.TEST_TYPE }} ${{ matrix.vendor-version.image }} ${{ steps.os-name-version.outputs.os-name }} ${{ steps.os-name-version.outputs.os-version }} tests logs
@@ -2168,7 +2168,7 @@ jobs:
             ${{ needs.setup.outputs.directory-path }}/argo-logs
       - name: Test Report
         id: test_report
-        uses: dorny/test-reporter@v1.7.0
+        uses: dorny/test-reporter@v1.9.0
         if: ${{ !cancelled() }}
         with:
           name: splunk ${{ matrix.splunk.version }}${{ secrets.OTHER_TA_REQUIRED_CONFIGS }} ${{ env.TEST_TYPE }} ${{ matrix.vendor-version.image }} ${{ steps.os-name-version.outputs.os-name }} ${{ steps.os-name-version.outputs.os-version }}  test report
@@ -2179,7 +2179,7 @@ jobs:
         run: |
           echo "pulling diag"
           aws s3 cp s3://${{ needs.setup.outputs.s3-bucket }}/diag-${{ steps.create-job-name.outputs.job-name }}/diag-${{ steps.create-job-name.outputs.job-name }}.tgz ${{ needs.setup.outputs.directory-path }}/
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: ${{ failure() && steps.test_report.outputs.conclusion == 'failure' }}
         with:
           name: archive splunk ${{ matrix.splunk.version }}${{ secrets.OTHER_TA_REQUIRED_CONFIGS }} ${{ env.TEST_TYPE }} ${{ matrix.vendor-version.image }} ${{ steps.os-name-version.outputs.os-name }} ${{ steps.os-name-version.outputs.os-version }} tests diag
@@ -2218,7 +2218,7 @@ jobs:
       statuses: read
       checks: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: configure git  # This step configures git to omit "dubious git ownership error" in later test-reporter stage
@@ -2233,7 +2233,7 @@ jobs:
         run: |
           echo "start_time=$(date +%s)" >> "$GITHUB_OUTPUT"
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v3
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -2389,13 +2389,13 @@ jobs:
           echo "pulling logs"
           mkdir -p ${{ needs.setup.outputs.directory-path }}/argo-logs
           aws s3 cp s3://${{ needs.setup.outputs.s3-bucket }}/${WORKFLOW_NAME}/ ${{ needs.setup.outputs.directory-path }}/argo-logs/ --recursive
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
           name: archive splunk ${{ matrix.splunk.version }}${{ secrets.OTHER_TA_REQUIRED_CONFIGS }} ${{ env.TEST_TYPE }} ${{ matrix.vendor-version.image }} ${{ steps.os-name-version.outputs.os-name }} ${{ steps.os-name-version.outputs.os-version }} tests artifacts
           path: |
             ${{ needs.setup.outputs.directory-path }}/test-results
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
           name: archive splunk ${{ matrix.splunk.version }}${{ secrets.OTHER_TA_REQUIRED_CONFIGS }} ${{ env.TEST_TYPE }} ${{ matrix.vendor-version.image }} ${{ steps.os-name-version.outputs.os-name }} ${{ steps.os-name-version.outputs.os-version }} tests logs
@@ -2403,7 +2403,7 @@ jobs:
             ${{ needs.setup.outputs.directory-path }}/argo-logs
       - name: Test Report
         id: test_report
-        uses: dorny/test-reporter@v1.7.0
+        uses: dorny/test-reporter@v1.9.0
         if: ${{ !cancelled() && !contains(matrix.splunk.version, 'unreleased-python3_9') }}
         with:
           name: splunk ${{ matrix.splunk.version }}${{ secrets.OTHER_TA_REQUIRED_CONFIGS }} ${{ env.TEST_TYPE }} ${{ matrix.vendor-version.image }} ${{ steps.os-name-version.outputs.os-name }} ${{ steps.os-name-version.outputs.os-version }}  test report
@@ -2412,7 +2412,7 @@ jobs:
       - name: Test Report Python 3.9
         continue-on-error: true
         id: test_report_python_3_9
-        uses: dorny/test-reporter@v1.7.0
+        uses: dorny/test-reporter@v1.9.0
         if: ${{ !cancelled() && contains(matrix.splunk.version, 'unreleased-python3_9') }}
         with:
           name: splunk ${{ matrix.splunk.version }}${{ secrets.OTHER_TA_REQUIRED_CONFIGS }} ${{ env.TEST_TYPE }} ${{ matrix.vendor-version.image }} ${{ steps.os-name-version.outputs.os-name }} ${{ steps.os-name-version.outputs.os-version }}  test report
@@ -2423,7 +2423,7 @@ jobs:
         run: |
           echo "pulling diag"
           aws s3 cp s3://${{ needs.setup.outputs.s3-bucket }}/diag-${{ steps.create-job-name.outputs.job-name }}/diag-${{ steps.create-job-name.outputs.job-name }}.tgz ${{ needs.setup.outputs.directory-path }}/
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: ${{ failure() && steps.test_report.outputs.conclusion == 'failure' }}
         with:
           name: archive splunk ${{ matrix.splunk.version }}${{ secrets.OTHER_TA_REQUIRED_CONFIGS }} ${{ env.TEST_TYPE }} ${{ matrix.vendor-version.image }} ${{ steps.os-name-version.outputs.os-name }} ${{ steps.os-name-version.outputs.os-version }} tests diag
@@ -2484,7 +2484,7 @@ jobs:
       statuses: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: false
           persist-credentials: false
@@ -2500,7 +2500,7 @@ jobs:
           passphrase: ${{ secrets.SA_GPG_PASSPHRASE }}
       - name: Download package-splunkbase
         if: ${{ steps.semantic.outputs.new_release_published == 'true' }}
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         id: download-package-splunkbase
         with:
           name: package-splunkbase
@@ -2509,7 +2509,7 @@ jobs:
         id: download-cim-compliance-report
         if: ${{ steps.semantic.outputs.new_release_published == 'true' }}
         continue-on-error: true
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: cim-compliance-report
           path: download/artifacts/deployment
@@ -2517,7 +2517,7 @@ jobs:
         id: download-cim-field-report
         if: ${{ steps.semantic.outputs.new_release_published == 'true' }}
         continue-on-error: true
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: cim-field-report
           path: download/artifacts/deployment
