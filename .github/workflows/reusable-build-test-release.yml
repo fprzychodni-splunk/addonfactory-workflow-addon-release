@@ -394,7 +394,7 @@ jobs:
       - uses: actions/checkout@v3
       - name: Semgrep
         id: semgrep
-        run: semgrep ci
+        run: semgrep ci --output=tmp/semgrep_output.txt
         env:
           SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_PUBLISH_TOKEN }}
 
@@ -474,12 +474,12 @@ jobs:
         run: poetry run pytest --cov=./ --cov-report=xml --junitxml=test-results/junit.xml tests/unit
       - name: Check coverage
         run: |
-          pip install coverage-report
-          coverage_report=$(coverage-report -m -o report.txt)
-          overall_coverage=$(echo "$coverage_report" | grep -E "^TOTAL" | awk '{print $6}' | cut -d'%' -f1')
-          if (($(echo "$overall_coverage < 40" | bc -l) )); then
-            echo "Overall coverage is below 40%"
-            exit 1
+          coverage_report=$(coverage report -m)
+          overall_coverage=$(echo $coverage_report | awk -F'TOTAL' '{print $2}' | rev | cut -d " " -f1 | rev | cut -d'%' -f1)
+          echo $overall_coverage
+          if [ $(echo "$overall_coverage < 50" | bc -l) -eq 1 ]; then
+              echo "Overall coverage is below 50%"
+              exit 1
           fi
       - uses: actions/upload-artifact@v3
         if: success() || failure()
